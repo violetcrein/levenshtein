@@ -9,7 +9,7 @@ use compare::compare;
 use util::color;
 
 #[derive(Parser, Debug)]
-#[command(author = "viowo", version, about = "A simple program to match text~", long_about = None)]
+#[command(author = "viowo", version, about = "A simple program to understand WHAT THE FUCK RUBY IS SAYING~", long_about = None)]
 struct Args {
     /// Text to check and cmatch
     #[arg(short, long)]
@@ -49,10 +49,10 @@ fn main() {
             let limit: usize = if output.len() >= args.length { args.length } else { output.len() };
 
             for i in 0..limit {
-                let end = if i == limit - 1 || (output[i].1 == 0.0 && args.full) { "" } else { ", " };
+                let end = if i == limit - 1 || (output[i].1 == 0.0 && !args.full) { "" } else { ", " };
                 print!("{}{}", output[i].0, end);
 
-                if output[i].1 == 0.0 && args.full {
+                if output[i].1 == 0.0 && !args.full {
                     break;
                 }
             }

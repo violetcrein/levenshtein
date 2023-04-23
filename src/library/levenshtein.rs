@@ -26,8 +26,9 @@ pub fn lev_distance(a: &str, b: &str) -> Result<u32> {
                 matrix[j-1][i-1] + sub_c, // subsitution
 
             ].iter().min().unwrap()};
-
-            if a.chars().nth(i) == b.chars().nth(j-1) && a.chars().nth(i-1) == b.chars().nth(j) {
+            
+            // transposition
+            if a.chars().nth(i) == b.chars().nth(j-1) && a.chars().nth(i-1) == b.chars().nth(j) && i > 1 && j > 1 {
                 matrix[j][i] = {*[
                     matrix[j][i],
                     matrix[j-2][i-2]
