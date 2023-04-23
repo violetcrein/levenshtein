@@ -23,8 +23,16 @@ pub fn lev_distance(a: &str, b: &str) -> Result<u32> {
             matrix[j][i] = {*[
                 matrix[j][i-1]+1, // deletion
                 matrix[j-1][i]+1, // insertion
-                matrix[j-1][i-1] + sub_c // subsitution
-            ].iter().min().unwrap()}
+                matrix[j-1][i-1] + sub_c, // subsitution
+
+            ].iter().min().unwrap()};
+
+            if a.chars().nth(i) == b.chars().nth(j-1) && a.chars().nth(i-1) == b.chars().nth(j) {
+                matrix[j][i] = {*[
+                    matrix[j][i],
+                    matrix[j-2][i-2]
+                ].iter().min().unwrap()};
+            }
         }
     }
 

@@ -1,43 +1,62 @@
+mod compare;
 mod library;
-mod ruby;
+mod find_word;
+mod util;
 
-use crate::ruby::find_word;
+use crate::find_word::find_word;
+use clap::Parser;
+use compare::compare;
+use util::color;
+
+#[derive(Parser, Debug)]
+#[command(author = "viowo", version, about = "A simple program to match text~", long_about = None)]
+struct Args {
+    /// Text to check and cmatch
+    #[arg(short, long)]
+    text: String,
+
+    /// Compare text to string (instead of finding matching word)
+    #[arg(short, long, )]
+    compare: Option<String>,
+
+    /// Number of options to send
+    #[arg(short, default_value_t = 8)]
+    length: usize,
+
+    /// Full even if matched
+    #[arg(short, default_value_t = false)]
+    full: bool,
+}
 
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    let mut end: usize = args.len();
-    let mut start: usize = 1;
-    let mut limit: usize = 8;
+    let args = Args::parse();
+    let text = args.text.split(" ").collect::<Vec<&str>>();
 
-    if args[1] == "-l" && args[2].parse::<usize>().is_ok() {
-        start = 3;
-        limit = args[2].parse::<usize>().unwrap();
+    // if you have the compare option on
+    if args.compare != None {
+        let c_output = compare(&args.text, &args.compare.unwrap());
+        println!("Distance   : {}", color(c_output.0, (3.0, 6.0, 10.0)));
+        println!("Levenshtein: {}", color(c_output.1 as f64, (3.0, 6.0, 10.0)));
+        println!("Keyboard   : {}", color(c_output.2, (3.0, 6.0, 10.0)));
     }
-    else if args[args.len() - 2] == "-l" && args[args.len() - 1].parse::<usize>().is_ok() {
-        end = args.len() - 2;
-        limit = args[args.len() - 1].parse::<usize>().unwrap();
-    }
+    else {
+        // multiple words
+        for j in 0..text.len() {
+            print!("{}: ", &text[j]);
+            let output = find_word(&text[j].to_lowercase());
 
-    if args[1] == "-f" {
-        start = 2;
-    }
-    
-    // adding multiple words to the cli
-    for j in start..end {
-        print!("{}: ", &args[j]);
-        let output = find_word(&args[j].to_lowercase());
+            // limit size of output
+            let limit: usize = if output.len() >= args.length { args.length } else { output.len() };
 
-        // limit size of output
-        let limit: usize = if output.len() >= limit { limit } else { output.len() };
+            for i in 0..limit {
+                let end = if i == limit - 1 || (output[i].1 == 0.0 && args.full) { "" } else { ", " };
+                print!("{}{}", output[i].0, end);
 
-        for i in 0..limit {
-            let end = if i == limit - 1 || (output[i].1 == 0.0 && args[1] != "-f") { "" } else { ", " };
-            print!("{}{}", output[i].0, end);
-
-            if output[i].1 == 0.0 && args[1] != "-f" {
-                break;
+                if output[i].1 == 0.0 && args.full {
+                    break;
+                }
             }
+            println!("");
         }
-        println!("");
     }
 }

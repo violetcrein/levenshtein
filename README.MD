@@ -1,2 +1,2 @@
-# Flav
-This isn't really that much of a cli program yet, it's just basic and bad, I will improve it in the next commit :D
+# IDK
+This is just a simple levenshtein + keyboard distance program to understand WHAT THE FUCK RUBY IS SAYING.
